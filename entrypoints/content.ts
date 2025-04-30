@@ -1,8 +1,8 @@
-import "~/assets/tailwind.css";
+import '~/assets/tailwind.css';
 
 export default defineContentScript({
-  matches: ["*://*/*"],
+  matches: ['*://*/*'],
   main() {
-    console.log("Hello content.");
+    console.log('Hello content.');
   },
 });
