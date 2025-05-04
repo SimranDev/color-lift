@@ -1,6 +1,6 @@
-export type Option = {
+export type Option<T> = {
   label: string;
-  value: string;
+  value: T;
 };
 
 export type Swatch = {
