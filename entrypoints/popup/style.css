@@ -20,3 +20,12 @@ body,
   overflow: hidden;
   right: -300px;
 }
+
+kbd {
+  background-color: #cad5e2;
+  color: #0f172b;
+  padding: 4px;
+  border-radius: 4px;
+  margin: 0 4px;
+  font-weight: 600;
+}
