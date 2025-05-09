@@ -29,3 +29,9 @@ kbd {
   margin: 0 4px;
   font-weight: 600;
 }
+
+.popup {
+  display: flex;
+  width: 668px;
+  height: 600px;
+}
