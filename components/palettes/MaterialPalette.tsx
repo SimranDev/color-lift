@@ -25,7 +25,8 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
               onClick={useOnClickColorTile({ hex, rgb, shade })}
             >
               <div
-                className={`h-full w-full pt-[5px] text-[9px] opacity-0 group-hover:opacity-100 ${shade.startsWith('A') ? 'text-black' : Number(shade) < 600 ? 'text-black' : 'text-zinc-200'}`}
+                className="h-full w-full pt-[5px] text-[9px] opacity-0 group-hover:opacity-100"
+                style={{ color: getContrastColor(hex) }}
                 draggable
                 onDragStart={(e) => {
                   if (!e.shiftKey) {
