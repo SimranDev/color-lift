@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const Toast = ({ m }: { m: { color: string; shade: string } }) => {
+const Toast = ({ msg }: { msg: { color: string; shade?: string } }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       const toastElement = document.getElementById('custom-toast');
       if (toastElement) {
         toastElement.remove();
       }
-    }, 5000);
+    }, 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  const color = getContrastColor(msg.color);
 
   return (
     <div
@@ -32,10 +34,10 @@ const Toast = ({ m }: { m: { color: string; shade: string } }) => {
     >
       <div
         style={{
-          backgroundColor: m.color,
+          color,
+          backgroundColor: msg.color,
           borderRadius: '4px 0 0 4px',
           padding: '8px 12px 8px 9px',
-          color: Number(m.shade) < 600 ? '#000' : '#fff',
           display: 'flex',
           gap: '5px',
           alignItems: 'center',
@@ -55,7 +57,7 @@ const Toast = ({ m }: { m: { color: string; shade: string } }) => {
             </path>
           </g>
         </svg>
-        <span style={{ color: Number(m.shade) < 600 ? 'black' : 'white' }}>{m.color}</span>
+        <span style={{ color }}>{msg.color}</span>
       </div>
       <span style={{ color: '#1c1917', padding: '8px 12px 8px 6px' }}>Copied to clipboard!</span>
     </div>
@@ -73,5 +75,5 @@ export const showToast = (message: { color: string; shade: string }, container?:
     document.body.appendChild(targetContainer);
   }
   const root = createRoot(targetContainer);
-  root.render(<Toast m={message} />);
+  root.render(<Toast msg={message} />);
 };
