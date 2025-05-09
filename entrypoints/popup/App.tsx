@@ -15,6 +15,7 @@ import MaterialPalette from '@/components/palettes/MaterialPalette';
 import RadixPalette from '@/components/palettes/RadixPalette';
 import { RADIX_DARK } from '@/utils/seed/radix-dark';
 import { RADIX_LIGHT } from '@/utils/seed/radix-light';
+import NordPalette from '@/components/palettes/NordPalette';
 
 function App() {
   const [pickingColor, setPickingColor] = useState(false);
@@ -22,7 +23,7 @@ function App() {
   const [isDragging, setIsDragging] = useState(false);
 
   return (
-    <main className="flex h-full">
+    <main>
       {pickingColor ? (
         <PickingColorPopup />
       ) : (
@@ -48,6 +49,7 @@ function App() {
           {activePalette === Palette.MATERIAL && <MaterialPalette setIsDragging={setIsDragging} />}
           {activePalette === Palette.RADIX_DARK && <RadixPalette colors={RADIX_DARK} setIsDragging={setIsDragging} />}
           {activePalette === Palette.RADIX_LIGHT && <RadixPalette colors={RADIX_LIGHT} setIsDragging={setIsDragging} />}
+          {activePalette === Palette.NORD && <NordPalette setIsDragging={setIsDragging} />}
           {activePalette === Palette.FAVOURITES && <FavouritesPalette />}
         </div>
       )}

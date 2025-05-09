@@ -6,4 +6,5 @@ export const paletteOptions: Option<Palette>[] = [
   { label: 'Material', value: Palette.MATERIAL },
   { label: 'Radix Dark', value: Palette.RADIX_DARK },
   { label: 'Radix Light', value: Palette.RADIX_LIGHT },
+  { label: 'Nord', value: Palette.NORD },
 ];
