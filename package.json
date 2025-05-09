@@ -1,8 +1,8 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "ColorLift",
+  "description": "🏆 Color palettes from Tailwind, Material UI, Radix and more — in HEX and RGB formats.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
