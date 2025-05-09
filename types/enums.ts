@@ -3,4 +3,5 @@ export enum Palette {
   MATERIAL = 'material',
   RADIX_DARK = 'radix-dark',
   RADIX_LIGHT = 'radix-light',
+  FAVOURITES = 'favourites',
 }
