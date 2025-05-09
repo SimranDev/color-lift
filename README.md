@@ -1,13 +1,16 @@
-# Color Lift
+![logo](https://github.com/user-attachments/assets/9571c41a-920f-4476-b29c-1dc6a6466153)
 
-Color Lift is a modern browser extension designed to help developers and designers work with color palettes efficiently. It provides tools for picking, managing, and utilizing colors in various formats, making it an essential utility for anyone working on UI/UX design or front-end development.
+[lift.codesim.dev](https://lift.codesim.dev/)
+
+Access popular design system colours like Material UI, Tailwind, and Radix directly in your browser. Perfect for developers and designers working with Figma, VS Code, or any design tool.
+
 
 ## Features
 
 - **Color Picker**: Easily pick colors from the screen using the integrated eye-dropper tool.
 - **Predefined Palettes**: Access popular color palettes like Material, Nord, Radix, and Tailwind.
-- **Favorites Management**: Save and manage your favorite colors and palettes.
-- **Format Toggle**: Switch between different color formats (e.g., HEX, RGB, HSL) effortlessly.
+- **Favourites Management**: Save and manage your favourite colors and palettes.
+- **Format Toggle**: Switch between different color formats (e.g., HEX, RGB) effortlessly.
 - **Recent Colors**: Quickly access recently used colors.
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 
@@ -65,7 +68,7 @@ To set up the project locally, follow these steps:
 
 1. Use the color picker tool to select colors from your screen.
 2. Browse through predefined palettes or create your own.
-3. Save your favorite colors for quick access.
+3. Save your favourite colors for quick access.
 4. Toggle between different color formats as needed.
 
 ## Contributing
