@@ -1,9 +1,9 @@
 const PickingColorPopup = () => {
   return (
-    <div className="grid h-16 w-56 bg-gradient-to-tl from-slate-700 to-stone-950 px-2 py-10">
+    <div className="grid h-16 w-56 bg-gradient-to-tl from-slate-700 to-stone-950 px-2 pt-2">
       <div className="flex gap-2">
         <svg
-          className="fill-lime-300"
+          className="fill-lime-200"
           width="19"
           height="18"
           viewBox="0 0 58 50"
@@ -14,7 +14,7 @@ const PickingColorPopup = () => {
         </svg>
         <span>PICK A COLOUR</span>
       </div>
-      <div className="mt-auto ml-auto text-slate-400">
+      <div className="mt-auto ml-auto pb-2 text-slate-400">
         Press <span className="border p-0.5 font-mono">ESC</span> to cancel
       </div>
     </div>
