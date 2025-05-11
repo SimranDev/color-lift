@@ -2,7 +2,7 @@
   "name": "ColorLift",
   "description": "🏆 Color palettes from Tailwind, Material UI, Radix and more — in HEX and RGB formats.",
   "private": true,
-  "version": "1.0",
+  "version": "1.2",
   "type": "module",
   "scripts": {
     "dev": "wxt",
