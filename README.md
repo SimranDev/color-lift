@@ -2,8 +2,7 @@
 
 [lift.codesim.dev](https://lift.codesim.dev/)
 
-Access popular design system colours like Material UI, Tailwind, and Radix directly in your browser. Perfect for developers and designers working with Figma, VS Code, or any design tool.
-
+Access popular design system colours like Material UI, Tailwind, Radix and Nord directly in your browser. Perfect for developers and designers working with Figma, VS Code, or any design tool.
 
 ## Features
 
