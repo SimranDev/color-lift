@@ -1,4 +1,4 @@
-import favGifSrc from '@/assets/favourites-howto.gif';
+import howToVid from '@/assets/howto-vid.mp4';
 
 const FavouritesPalette = () => {
   const { favourites, setRecent, activeFormat, removeFavourite } = useStore();
@@ -57,7 +57,7 @@ const FavouritesPalette = () => {
               >
                 CLOSE
               </div>
-              <img src={favGifSrc} alt="gif" className="h-[26rem]" />
+              <video className="h-[26rem]" autoPlay loop muted playsInline src={howToVid} />
             </div>
           )}
           <svg
