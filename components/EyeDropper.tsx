@@ -9,25 +9,30 @@ const EyeDropper = ({ setPickingColor }: EyeDropperProps) => {
   const { setRecent, activeFormat } = useStore();
 
   const handleColorPick = async () => {
-    if ('EyeDropper' in window) {
-      const eyeDropper = new (window as any).EyeDropper();
-      try {
-        setPickingColor(true);
-        const result = await eyeDropper.open();
-        const rgb = hexToRgb(result.sRGBHex);
-        const color = activeFormat === 'hex' ? result.sRGBHex : rgb;
-        setRecent({ hex: result.sRGBHex, rgb });
-        await navigator.clipboard.writeText(color);
-        await browser.runtime.sendMessage({ color });
-      } catch (error) {
-        setPickingColor(false);
-        console.error('Error using EyeDropper:', error);
-      } finally {
-        setPickingColor(false);
-        window.close();
-      }
-    } else {
+    if (!('EyeDropper' in window)) {
       alert('Your browser does not support the EyeDropper API.');
+      return;
+    }
+
+    const eyeDropper = new (window as any).EyeDropper();
+
+    try {
+      setPickingColor(true);
+      const result = await eyeDropper.open();
+      const rgb = hexToRgb(result.sRGBHex);
+      const color = activeFormat === 'hex' ? result.sRGBHex : rgb;
+
+      await setRecent({ hex: result.sRGBHex, rgb });
+      await navigator.clipboard.writeText(color);
+      await browser.runtime.sendMessage({ color });
+      window.close();
+    } catch (error) {
+      // Dismissing the picker with Escape rejects with AbortError. That is a
+      // cancel, not a failure, so drop back to the palette instead of closing.
+      setPickingColor(false);
+      if ((error as DOMException)?.name !== 'AbortError') {
+        console.error('Error using EyeDropper:', error);
+      }
     }
   };
 
