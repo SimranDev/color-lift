@@ -1,4 +1,4 @@
-import { setRecent, setActiveFormat, setActivePalette, store, setFavourites } from '@/store';
+import { setRecent, setActiveFormat, setActivePalette, store, setFavourites, StoredState } from '@/store';
 import { useEffect, useState } from 'react';
 import { Palette } from '@/types/enums';
 
@@ -21,19 +21,17 @@ function useStore(): Store {
   const [favourites, setFavouritesState] = useState<Store['favourites']>([]);
 
   useEffect(() => {
-    store.getValue().then(({ recent, activeFormat, activePalette, favourites }) => {
-      setRecentState(recent);
-      setActiveFormatState(activeFormat);
-      setActivePaletteState(activePalette);
-      setFavouritesState(favourites);
-    });
+    // storage.defineItem's fallback covers a missing item, not missing keys, so
+    // an install that predates a field still reads it back as undefined.
+    const applySnapshot = ({ recent, activeFormat, activePalette, favourites }: Partial<StoredState>) => {
+      setRecentState(recent ?? []);
+      setActiveFormatState(activeFormat ?? 'hex');
+      setActivePaletteState(activePalette ?? Palette.TAILWIND);
+      setFavouritesState(favourites ?? []);
+    };
 
-    const unsubscribe = store.watch(({ recent, activeFormat, activePalette, favourites }) => {
-      setRecentState(recent);
-      setActiveFormatState(activeFormat);
-      setActivePaletteState(activePalette);
-      setFavouritesState(favourites);
-    });
+    store.getValue().then(applySnapshot);
+    const unsubscribe = store.watch(applySnapshot);
 
     return () => {
       unsubscribe();
@@ -41,21 +39,15 @@ function useStore(): Store {
   }, []);
 
   const updateRecent = async (newRecent: { hex: string; rgb: string }) => {
-    console.log('Updating recent colors:', newRecent);
     setRecentState((prev) => {
       const updatedRecent = [newRecent, ...prev.filter((color) => color.hex !== newRecent.hex)];
       return updatedRecent.slice(0, 6);
     });
 
-    const updatedRecent = await store.getValue().then(({ recent }) => {
-      const updated = [
-        newRecent,
-        ...recent.filter((color: { hex: string; rgb: string }) => color.hex !== newRecent.hex),
-      ];
-      return updated.slice(0, 6);
-    });
+    const { recent } = await store.getValue();
+    const updatedRecent = [newRecent, ...(recent ?? []).filter((color) => color.hex !== newRecent.hex)];
 
-    await setRecent(updatedRecent);
+    await setRecent(updatedRecent.slice(0, 6));
   };
 
   const updateActiveFormat = async (format: 'hex' | 'rgb') => {
@@ -69,27 +61,17 @@ function useStore(): Store {
   };
 
   const updateFavourites = async (fav: { hex: string; rgb: string }) => {
-    console.log('Updating favourites:', fav);
     setFavouritesState((prev) => [fav, ...prev.filter((color) => color.hex !== fav.hex)]);
 
-    const updatedFavourites = await store.getValue().then(({ favourites }) => {
-      const updated = [fav, ...favourites.filter((color) => color.hex !== fav.hex)];
-      return updated;
-    });
-    await setFavourites(updatedFavourites);
+    const { favourites } = await store.getValue();
+    await setFavourites([fav, ...(favourites ?? []).filter((color) => color.hex !== fav.hex)]);
   };
 
   const removeFavourite = async (fav: { hex: string; rgb: string }) => {
     setFavouritesState((prev) => prev.filter((color) => color.hex !== fav.hex));
 
-    const updatedFavourites = await store.getValue().then(({ favourites }) => {
-      if (favourites && favourites.length) {
-        const updated = favourites.filter((color) => color.hex !== fav.hex);
-        return updated;
-      }
-      return [fav];
-    });
-    await setFavourites(updatedFavourites);
+    const { favourites } = await store.getValue();
+    await setFavourites((favourites ?? []).filter((color) => color.hex !== fav.hex));
   };
 
   return {

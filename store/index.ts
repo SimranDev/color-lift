@@ -1,6 +1,6 @@
 import { Palette } from '@/types/enums';
 
-type Store = {
+export type StoredState = {
   recent: { hex: string; rgb: string }[];
   activeFormat: 'hex' | 'rgb';
   activePalette: Palette;
@@ -9,7 +9,7 @@ type Store = {
 
 export const storageKey = 'local:color-store';
 
-export const store = storage.defineItem<Store>(storageKey, {
+export const store = storage.defineItem<StoredState>(storageKey, {
   fallback: {
     recent: [],
     activeFormat: 'hex',
@@ -43,7 +43,6 @@ export const setActivePalette = async (activePalette: Palette) => {
 };
 
 export const setFavourites = async (favourites: { hex: string; rgb: string }[]) => {
-  console.log('Updating favourites:', favourites);
   const currentStore = await store.getValue();
   await store.setValue({
     ...currentStore,
