@@ -16,7 +16,7 @@ const TailwindPalette = ({ setIsDragging }: TailwindPaletteProps) => {
       className={`grid gap-[7px] p-[7px] ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700`}
     >
       {TAILWIND.map(({ swatches, name }) => (
-        <div className="flex cursor-default gap-[7px]">
+        <div key={name} className="flex cursor-default gap-[7px]">
           <span style={{ fontSize: 11, width: 38 }} className="text-zinc-200">
             {name}
           </span>

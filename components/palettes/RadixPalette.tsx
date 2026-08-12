@@ -16,7 +16,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
       className={`grid gap-[1px] p-1 ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
     >
       {colors.map(({ swatches, name }) => (
-        <div className="flex cursor-default gap-[5px]">
+        <div key={name} className="flex cursor-default gap-[5px]">
           <span className="text-zinc-200" style={{ fontSize: 11, width: 38, lineHeight: 0.2, margin: 'auto 0' }}>
             {name}
           </span>

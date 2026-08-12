@@ -13,7 +13,7 @@ const NordPalette = ({ setIsDragging }: NordPaletteProps) => {
       className={`grid h-fit gap-2 p-2 transition-opacity duration-1000 ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'}`}
     >
       {NORD.map(({ swatches, name }) => (
-        <div className="flex h-fit cursor-default items-center gap-2">
+        <div key={name} className="flex h-fit cursor-default items-center gap-2">
           <span className="w-18 text-xs text-zinc-200">{name}</span>
           {swatches.map(({ shade, hex, rgb }) => (
             <div

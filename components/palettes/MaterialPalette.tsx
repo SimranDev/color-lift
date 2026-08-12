@@ -14,7 +14,7 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
       className={`grid gap-[7px] p-[7px] ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
     >
       {MATERIAL.map(({ swatches, name }) => (
-        <div className="flex cursor-default gap-[7px]">
+        <div key={name} className="flex cursor-default gap-[7px]">
           <span className="text-zinc-200" style={{ fontSize: 11, width: 38, lineHeight: 1, margin: 'auto 0' }}>
             {name}
           </span>
