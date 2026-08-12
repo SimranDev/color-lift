@@ -1,4 +1,4 @@
-import { defineConfig, WxtViteConfig } from 'wxt';
+import { defineConfig, type WxtViteConfig } from 'wxt';
 import tailwindcss from '@tailwindcss/vite';
 
 // See https://wxt.dev/api/config.html

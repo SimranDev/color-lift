@@ -1,4 +1,4 @@
-import { setRecent, setActiveFormat, setActivePalette, store, setFavourites, StoredState } from '@/store';
+import { setRecent, setActiveFormat, setActivePalette, store, setFavourites, type StoredState } from '@/store';
 import { useEffect, useState } from 'react';
 import { Palette } from '@/types/enums';
 

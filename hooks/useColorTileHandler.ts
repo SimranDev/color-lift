@@ -1,4 +1,4 @@
-import { Swatch } from '@/types/common';
+import type { Swatch } from '@/types/common';
 
 /**
  * Returns a factory that builds the click handler for a swatch tile.

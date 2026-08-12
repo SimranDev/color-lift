@@ -1,4 +1,4 @@
-import { Color } from '@/types/common';
+import type { Color } from '@/types/common';
 
 export const RADIX_DARK: Color[] = [
   {

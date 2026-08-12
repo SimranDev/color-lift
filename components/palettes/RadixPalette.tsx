@@ -1,6 +1,6 @@
 import { useIsLoadedState } from '@/hooks/useIsLoadedState';
 import { useColorTileHandler } from '@/hooks/useColorTileHandler';
-import { Color } from '@/types/common';
+import type { Color } from '@/types/common';
 
 type RadixPaletteProps = {
   colors: Color[];

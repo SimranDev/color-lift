@@ -1,4 +1,4 @@
-import { Option } from '@/types/common';
+import type { Option } from '@/types/common';
 import { Palette } from '@/types/enums';
 
 export const paletteOptions: Option<Palette>[] = [
