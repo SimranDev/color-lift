@@ -28,7 +28,7 @@ To set up the project locally, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/color-lift.git
+   git clone https://github.com/SimranDev/color-lift.git
    ```
 
 2. Navigate to the project directory:
@@ -46,7 +46,8 @@ To set up the project locally, follow these steps:
 4. Build the project:
 
    ```bash
-   pnpm build
+   pnpm build           # Chrome
+   pnpm build:firefox   # Firefox
    ```
 
 5. Load the extension in your browser:
@@ -55,13 +56,15 @@ To set up the project locally, follow these steps:
 
      1. Open `chrome://extensions/` in your browser.
      2. Enable "Developer mode" in the top-right corner.
-     3. Click "Load unpacked" and select the `dist` folder from the project directory.
+     3. Click "Load unpacked" and select the `.output/chrome-mv3` folder from the project directory.
 
    - **For Firefox**:
      1. Open `about:debugging#/runtime/this-firefox` in your browser.
-     2. Click "Load Temporary Add-on..." and select any file from the `dist` folder.
+     2. Click "Load Temporary Add-on..." and select any file from the `.output/firefox-mv2` folder.
 
 6. The extension should now be loaded and ready to use.
+
+For day-to-day work use `pnpm dev` (or `pnpm dev:firefox`) instead — it launches a browser with the extension already loaded and reloads on save.
 
 ## Usage
 
