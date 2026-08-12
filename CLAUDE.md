@@ -11,10 +11,12 @@ pnpm dev:firefox
 pnpm build            # -> .output/chrome-mv3/  (README says `dist`; it is actually .output/)
 pnpm build:firefox
 pnpm zip              # packaged artifact for store upload
-pnpm compile          # tsc --noEmit — the only checking step
+pnpm compile          # tsc --noEmit — the only correctness gate
+pnpm format           # prettier --write .
+pnpm format:check     # prettier --check .
 ```
 
-There is no test suite and no lint script. Prettier is configured (`.prettierrc`, with `prettier-plugin-tailwindcss`) but has no npm script — invoke `pnpm exec prettier` directly.
+There is no test suite and no linter. `pnpm compile` plus `pnpm format:check` is the whole check surface.
 
 If types/auto-imports look wrong after adding a file under `components/`, `hooks/`, or `utils/`, run `pnpm exec wxt prepare` to regenerate `.wxt/`.
 
@@ -30,7 +32,9 @@ If types/auto-imports look wrong after adding a file under `components/`, `hooks
 | `utils/seed/radix-dark`  | `RADIX_DARK`  | [entrypoints/popup/App.tsx](entrypoints/popup/App.tsx)                             |
 | `utils/seed/radix-light` | `RADIX_LIGHT` | [entrypoints/popup/App.tsx](entrypoints/popup/App.tsx)                             |
 
-Every swatch carries `hex` **and** `rgb` as pre-computed strings — the UI never converts between them at render time, it just picks the field matching `activeFormat`. The two must stay in sync by hand; `rgb` is formatted `rgb(r, g, b)` with spaces after the commas, which is what `rgbToHex`'s digit-matching and the Favourites drop handler expect. `shade` doubles as the React `key`, so it must be unique within its group.
+Every swatch carries `hex` **and** `rgb` as pre-computed strings — the UI never converts between them at render time, it just picks the field matching `activeFormat`. The two must stay in sync by hand; `rgb` is formatted `rgb(r, g, b)` with spaces after the commas, which is what `rgbToHex`'s digit-matching and the Favourites drop handler expect.
+
+Both identifiers are load-bearing as React keys: `shade` must be unique within its group, and `name` must be unique within its file. Material previously shipped `Amber` twice (with `Deep Orange` missing entirely), so it's worth re-checking uniqueness after editing seed data.
 
 ## Architecture
 
@@ -42,7 +46,9 @@ WXT (`wxt.config.ts`) + React 19 + Tailwind v4, MV3. Three entrypoints under [en
 
 ### The copy flow (spans all three entrypoints)
 
-Clicking any swatch runs [hooks/useOnClickColorTile.ts](hooks/useOnClickColorTile.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`. The background listener then queries **every** tab matching `*://*/*` and forwards the message to each one, so the toast is broadcast to all open tabs, not just the active one. Each content script calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx), which mounts a fresh `createRoot` into a bare `<div>` on the host page and self-removes after 4s. That toast is styled with inline styles only — it renders on arbitrary sites where the extension's Tailwind is not loaded, so keep it that way.
+Clicking any swatch runs the handler built by [hooks/useColorTileHandler.ts](hooks/useColorTileHandler.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`. The background listener forwards the message to the active tab of the current window, which calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx) — a fresh `createRoot` mounted into a bare `<div>` on the host page that self-removes after 4s. That toast is styled with inline styles only, because it renders on arbitrary sites where the extension's Tailwind is not loaded; keep it that way.
+
+Nothing renders if the active tab is a `chrome://` page, the Web Store, or anywhere else the content script cannot run. The clipboard write still succeeds — only the confirmation is missing.
 
 `host_permissions` for `https://*/*` and `http://*/*` exist solely so `browser.tabs.sendMessage` can reach those content scripts.
 
@@ -50,7 +56,11 @@ Clicking any swatch runs [hooks/useOnClickColorTile.ts](hooks/useOnClickColorTil
 
 One WXT storage item, `local:color-store`, defined in [store/index.ts](store/index.ts) — `recent` (capped at 6), `favourites`, `activeFormat`, `activePalette`. The setters there are whole-object read-modify-write, so concurrent writes to different fields can clobber each other.
 
-[hooks/useStore.ts](hooks/useStore.ts) is the only thing components touch. It mirrors the storage item into React state, subscribes with `store.watch`, and each of its updaters writes optimistically to local state _and_ re-reads storage before persisting. It is a plain hook with no shared context — every component calling `useStore()` holds its own copy of the state, kept in sync only by the `store.watch` subscription.
+`storage.defineItem`'s `fallback` only covers a **missing item, not missing keys**. An install predating a field reads that field back as `undefined`, so `useStore` defaults every field as it hydrates. Don't assume a field is populated just because the type says so.
+
+[hooks/useStore.ts](hooks/useStore.ts) is the only thing components touch. It mirrors the storage item into React state, subscribes with `store.watch`, and each updater writes optimistically to local state _and_ re-reads storage before persisting. It is a plain hook with no shared context — every component calling `useStore()` holds its own copy of the state, kept in sync only by the `store.watch` subscription.
+
+That last point sets a real budget: **each `useStore()` is one storage read plus one live watcher**, and every write fans out to all of them. Keep calls proportional to components, never to data. Palettes render hundreds of tiles, so a hook called per tile is a performance bug — see below.
 
 ### Auto-imports
 
@@ -62,7 +72,7 @@ Each palette is its own component under [components/palettes/](components/palett
 
 Adding a palette means touching four places: the `Palette` enum in [types/enums.ts](types/enums.ts), `paletteOptions` in [utils/options.ts](utils/options.ts) (this drives the sidebar links), a component, and the conditional chain in `App.tsx`.
 
-Palettes call `useOnClickColorTile(...)` inside `.map()` callbacks as the `onClick` value. This is a Rules-of-Hooks violation that happens to work only because the seed arrays are constant-length — do not make palette rendering conditional or variable-length without restructuring that call first.
+Tile click handlers come from `useColorTileHandler()`, which each palette calls **once** and then reuses: `const createTileHandler = useColorTileHandler();` at the top, `onClick={createTileHandler(swatch)}` inside the map. `createTileHandler` is a plain function, not a hook — do not inline the hook into the map. Doing so mounts one `useStore` per swatch (336 on Radix), which is both a Rules-of-Hooks violation and the performance bug described above.
 
 ### Favourites
 
