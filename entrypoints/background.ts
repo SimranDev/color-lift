@@ -1,26 +1,19 @@
 export default defineBackground(() => {
+  const contentScriptMatches = new MatchPattern('*://*/*');
+
   browser.runtime.onMessage.addListener(async (message) => {
-    // Grab tabs matching content scripts
-    const allTabs = await browser.tabs.query({});
-    const contentScriptMatches = new MatchPattern('*://*/*');
-    const contentScriptTabs = allTabs.filter(
-      (tab) => tab.id != null && tab.url != null && contentScriptMatches.includes(tab.url)
-    );
+    // The toast belongs where the user is working, so it goes to the active tab
+    // of the current window rather than every tab running the content script.
+    const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
-    // Forward message to tabs, collecting the responses
-    const responses = await Promise.all(
-      contentScriptTabs.map(async (tab) => {
-        try {
-          const response = await browser.tabs.sendMessage(tab.id!, message);
-          return { tab: tab.id, response };
-        } catch (error) {
-          console.error(`Error sending message to tab ${tab.id}:`, error);
-          return { tab: tab.id, error };
-        }
-      })
-    );
+    if (activeTab?.id == null || activeTab.url == null) return;
+    if (!contentScriptMatches.includes(activeTab.url)) return;
 
-    // Return an array of all responses back to popup.
-    return responses;
+    try {
+      return await browser.tabs.sendMessage(activeTab.id, message);
+    } catch (error) {
+      // No content script on the page yet (or it was torn down mid-navigation).
+      console.error(`Error sending message to tab ${activeTab.id}:`, error);
+    }
   });
 });
