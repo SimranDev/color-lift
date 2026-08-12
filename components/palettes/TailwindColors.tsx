@@ -1,5 +1,5 @@
 import { useIsLoadedState } from '@/hooks/useIsLoadedState';
-import { useOnClickColorTile } from '@/hooks/useOnClickColorTile';
+import { useColorTileHandler } from '@/hooks/useColorTileHandler';
 import { TAILWIND } from '@/utils/seed/tailwind';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -9,6 +9,7 @@ type TailwindPaletteProps = {
 
 const TailwindPalette = ({ setIsDragging }: TailwindPaletteProps) => {
   const { activeFormat } = useStore();
+  const createTileHandler = useColorTileHandler();
 
   return (
     <div
@@ -24,7 +25,7 @@ const TailwindPalette = ({ setIsDragging }: TailwindPaletteProps) => {
               key={shade}
               className="group h-5 w-[37.6px] text-center transition-transform hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={useOnClickColorTile({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb, shade })}
             >
               <div
                 className={`h-full w-full pt-[3px] text-center text-[9px] opacity-0 group-hover:opacity-100 ${Number(shade) < 600 ? 'text-black' : 'text-zinc-200'}`}

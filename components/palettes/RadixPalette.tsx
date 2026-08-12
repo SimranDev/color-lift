@@ -1,5 +1,5 @@
 import { useIsLoadedState } from '@/hooks/useIsLoadedState';
-import { useOnClickColorTile } from '@/hooks/useOnClickColorTile';
+import { useColorTileHandler } from '@/hooks/useColorTileHandler';
 import { Color } from '@/types/common';
 
 type RadixPaletteProps = {
@@ -9,6 +9,7 @@ type RadixPaletteProps = {
 
 const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
   const { activeFormat } = useStore();
+  const createTileHandler = useColorTileHandler();
 
   return (
     <div
@@ -25,7 +26,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
               key={shade}
               className="group h-[18.2px] w-[36.2px] text-center transition-transform hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={useOnClickColorTile({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb, shade })}
             >
               <div
                 className="h-full w-full pt-[3px] text-center text-[9px] opacity-0 group-hover:opacity-100"

@@ -7,6 +7,7 @@ type MaterialPaletteProps = {
 
 const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
   const { activeFormat } = useStore();
+  const createTileHandler = useColorTileHandler();
 
   return (
     <div
@@ -22,7 +23,7 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
               key={shade}
               className="group grid h-6 w-7 place-items-center text-center transition-transform select-none hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={useOnClickColorTile({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb, shade })}
             >
               <div
                 className="h-full w-full pt-[5px] text-[9px] opacity-0 group-hover:opacity-100"
