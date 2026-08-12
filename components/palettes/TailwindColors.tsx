@@ -1,7 +1,6 @@
 import { useIsLoadedState } from '@/hooks/useIsLoadedState';
 import { useColorTileHandler } from '@/hooks/useColorTileHandler';
 import { TAILWIND } from '@/utils/seed/tailwind';
-import { Dispatch, SetStateAction } from 'react';
 
 type TailwindPaletteProps = {
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
