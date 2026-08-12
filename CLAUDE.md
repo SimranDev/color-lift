@@ -38,7 +38,7 @@ Both identifiers are load-bearing as React keys: `shade` must be unique within i
 
 ## Architecture
 
-WXT (`wxt.config.ts`) + React 19 + Tailwind v4, MV3. Three entrypoints under [entrypoints/](entrypoints/):
+WXT 0.21 (`wxt.config.ts`, Vite 8 / Rolldown) + React 19 + Tailwind v4 + TypeScript 7, MV3. Three entrypoints under [entrypoints/](entrypoints/):
 
 - **`popup/`** — the whole UI. Fixed 668×600 (`.popup` in [entrypoints/popup/style.css](entrypoints/popup/style.css)).
 - **`background.ts`** — a message relay, nothing else.
@@ -61,6 +61,12 @@ One WXT storage item, `local:color-store`, defined in [store/index.ts](store/ind
 [hooks/useStore.ts](hooks/useStore.ts) is the only thing components touch. It mirrors the storage item into React state, subscribes with `store.watch`, and each updater writes optimistically to local state _and_ re-reads storage before persisting. It is a plain hook with no shared context — every component calling `useStore()` holds its own copy of the state, kept in sync only by the `store.watch` subscription.
 
 That last point sets a real budget: **each `useStore()` is one storage read plus one live watcher**, and every write fans out to all of them. Keep calls proportional to components, never to data. Palettes render hundreds of tiles, so a hook called per tile is a performance bug — see below.
+
+### Type-only imports are mandatory
+
+WXT's generated tsconfig sets `verbatimModuleSyntax`, and the Rolldown bundler enforces it too. Importing a type as a value fails **both** `tsc` (`TS1484`) and the build (`MISSING_EXPORT`) — the build error is the confusing one, since it claims an export is missing when it plainly exists.
+
+Use `import type { Color } from '@/types/common'` when everything in the statement is a type, and the inline modifier — `import { defineConfig, type WxtViteConfig } from 'wxt'` — when a statement mixes values and types. Note `Palette` in [types/enums.ts](types/enums.ts) is an `enum`, which is a real runtime value: import it normally, never as a type.
 
 ### Auto-imports
 
