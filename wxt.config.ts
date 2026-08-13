@@ -8,7 +8,7 @@ export default defineConfig({
     plugins: [tailwindcss() as unknown as WxtViteConfig['plugins']],
   }),
   manifest: {
-    permissions: ['storage'],
+    permissions: ['storage', 'scripting'],
     host_permissions: ['https://*/*', 'http://*/*'],
   },
 });
