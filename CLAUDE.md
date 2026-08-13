@@ -47,6 +47,18 @@ WXT 0.21 (`wxt.config.ts`, Vite 8 / Rolldown) + React 19 + Tailwind v4 + TypeScr
 - **`background.ts`** — a message relay, nothing else.
 - **`toast.content/`** — content script on `*://*/*` that renders the "Copied to clipboard!" toast.
 
+### Responsive shell
+
+The two surfaces share one component tree and diverge through **container queries**, not a surface flag. `.shell` carries `@container` in [components/App.tsx](components/App.tsx), and the narrow layout is expressed as `@max-xl:` variants (Tailwind compiles these to `@container not (width>=36rem)` — 576px).
+
+This is deliberate: the side panel is user-resizable, so "how wide is it" is the right question and "is it a panel" is the wrong one. A panel dragged past 576px gets the popup layout for free, and the popup — fixed at 668px — can never cross the breakpoint, so it is provably unaffected by anything under `@max-xl:`. Reach for `isSidePanel()` only for genuine surface differences (the pop-out button, `PickingColorPopup`), never for width.
+
+Below the breakpoint the left rail becomes a top bar. The mechanism is flex ordering, not a second component tree: children get `@max-xl:order-1..6`, and the two that carry `@max-xl:w-full` (`PaletteLinks`, `Recent`) force the wrap, landing it as three rows — chrome, palette strip, recents. The dividers are `@max-xl:hidden` because they are horizontal rules. If you add something to the rail, give it an `order` or it lands at the front.
+
+The wordmark in [components/Logo.tsx](components/Logo.tsx) is `@max-xl:hidden` for a measured reason: it is the widest item in the bar, and dropping to the icon is what keeps row one on a single line at a 320px panel (~293px of content). Widening anything in that row risks a wrap.
+
+What this does **not** fix is the palettes. Their tile sizes are hardcoded (`w-[37.6px]` in Tailwind, `w-[36.2px]` in Radix), so a narrow panel still scrolls the grid horizontally — reflowing it means reworking all five palette components.
+
 ### The copy flow (spans all four entrypoints)
 
 Clicking any swatch runs the handler built by [hooks/useColorTileHandler.ts](hooks/useColorTileHandler.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`, that last step **only in the popup**. The background listener forwards the message to the active tab of the current window, which calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx) — a fresh `createRoot` mounted into a bare `<div>` on the host page that self-removes after 4s. That toast is styled with inline styles only, because it renders on arbitrary sites where the extension's Tailwind is not loaded; keep it that way.

@@ -42,9 +42,9 @@ const EyeDropper = ({ setPickingColor }: EyeDropperProps) => {
     return (
       <div
         title={UNSUPPORTED_HINT}
-        className="grid h-12 w-12 cursor-not-allowed place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 opacity-40"
+        className="grid h-12 w-12 cursor-not-allowed place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 opacity-40 @max-xl:h-9 @max-xl:w-9"
       >
-        <img src={eyeDropperSrc} alt="Color Picker (unavailable in this browser)" className="h-5" />
+        <img src={eyeDropperSrc} alt="Color Picker (unavailable in this browser)" className="h-5 @max-xl:h-4" />
       </div>
     );
   }
@@ -52,9 +52,9 @@ const EyeDropper = ({ setPickingColor }: EyeDropperProps) => {
   return (
     <div
       onClick={handleColorPick}
-      className="grid h-12 w-12 cursor-pointer place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 hover:from-lime-900"
+      className="grid h-12 w-12 cursor-pointer place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 hover:from-lime-900 @max-xl:h-9 @max-xl:w-9"
     >
-      <img src={eyeDropperSrc} alt="Color Picker" className="h-5 fill-red-500 text-red-500" />
+      <img src={eyeDropperSrc} alt="Color Picker" className="h-5 fill-red-500 text-red-500 @max-xl:h-4" />
     </div>
   );
 };
