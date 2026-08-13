@@ -6,7 +6,7 @@ Access popular design system colours like Material UI, Tailwind, Radix and Nord 
 
 ## Features
 
-- **Color Picker**: Easily pick colors from the screen using the integrated eye-dropper tool.
+- **Color Picker**: Easily pick colors from the screen using the integrated eye-dropper tool. Chromium only — Firefox has not shipped the [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API), so the button is disabled there. Firefox users can reach the browser's own eyedropper via Menu → More Tools → Eyedropper.
 - **Predefined Palettes**: Access popular color palettes like Material, Nord, Radix, and Tailwind.
 - **Favourites Management**: Save and manage your favourite colors and palettes.
 - **Format Toggle**: Switch between different color formats (e.g., HEX, RGB) effortlessly.
