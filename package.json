@@ -1,6 +1,6 @@
 {
   "name": "ColorLift",
-  "description": "🏆 Color palettes from Tailwind, Material, Radix, Nord and more — in HEX and RGB formats.",
+  "description": "🏆 Color palettes from Tailwind, Material, Radix and Nord — copy as HEX, RGB or OKLCH, in a popup or side panel.",
   "private": true,
   "version": "1.5",
   "type": "module",
