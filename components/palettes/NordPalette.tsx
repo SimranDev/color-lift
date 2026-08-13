@@ -13,12 +13,12 @@ const NordPalette = ({ setIsDragging }: NordPaletteProps) => {
       className={`grid h-fit gap-2 p-2 transition-opacity duration-1000 ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'}`}
     >
       {NORD.map(({ swatches, name }) => (
-        <div key={name} className="flex h-fit cursor-default items-center gap-2">
-          <span className="w-18 text-xs text-zinc-200">{name}</span>
+        <div key={name} className="flex h-fit cursor-default items-center gap-2 @max-xl:gap-1">
+          <span className="w-18 text-xs text-zinc-200 @max-xl:w-12 @max-xl:text-[10px]">{name}</span>
           {swatches.map(({ shade, hex, rgb }) => (
             <div
               key={shade}
-              className="group grid h-9 w-20 place-items-center text-center transition-transform select-none hover:scale-125"
+              className="group grid h-9 w-20 place-items-center text-center transition-transform select-none hover:scale-125 @max-xl:min-w-0 @max-xl:flex-1"
               style={{ backgroundColor: hex }}
               onClick={createTileHandler({ hex, rgb })}
             >

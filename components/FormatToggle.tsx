@@ -2,7 +2,7 @@ const FormatToggle = () => {
   const { activeFormat, setActiveFormat } = useStore();
 
   return (
-    <div className="px-2 @max-xl:order-2 @max-xl:w-28 @max-xl:shrink-0 @max-xl:px-0">
+    <div className="px-2 @max-xl:order-4 @max-xl:w-28 @max-xl:shrink-0 @max-xl:px-0">
       <div className="flex h-5 w-full cursor-pointer rounded-[2px] bg-slate-500 text-center font-mono text-[10px] leading-5 font-bold">
         {formatOptions.map(({ label, value }) => (
           <span

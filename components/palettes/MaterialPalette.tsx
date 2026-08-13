@@ -14,14 +14,14 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
       className={`grid gap-[7px] p-[7px] ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
     >
       {MATERIAL.map(({ swatches, name }) => (
-        <div key={name} className="flex cursor-default gap-[7px]">
+        <div key={name} className="flex cursor-default gap-[7px] @max-xl:gap-[2px]">
           <span className="text-zinc-200" style={{ fontSize: 11, width: 38, lineHeight: 1, margin: 'auto 0' }}>
             {name}
           </span>
           {swatches.map(({ shade, hex, rgb }) => (
             <div
               key={shade}
-              className="group grid h-6 w-7 place-items-center text-center transition-transform select-none hover:scale-150"
+              className="group grid h-6 w-7 place-items-center text-center transition-transform select-none hover:scale-150 @max-xl:min-w-0 @max-xl:flex-1"
               style={{ backgroundColor: hex }}
               onClick={createTileHandler({ hex, rgb })}
             >
