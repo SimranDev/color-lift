@@ -47,20 +47,6 @@ WXT 0.21 (`wxt.config.ts`, Vite 8 / Rolldown) + React 19 + Tailwind v4 + TypeScr
 - **`background.ts`** — a message relay, nothing else.
 - **`toast.content/`** — content script on `*://*/*` that renders the "Copied to clipboard!" toast.
 
-### Responsive shell
-
-The two surfaces share one component tree and diverge through **container queries**, not a surface flag. `.shell` carries `@container` in [components/App.tsx](components/App.tsx), and the narrow layout is expressed as `@max-xl:` variants (Tailwind compiles these to `@container not (width>=36rem)` — 576px).
-
-This is deliberate: the side panel is user-resizable, so "how wide is it" is the right question and "is it a panel" is the wrong one. A panel dragged past 576px gets the popup layout for free, and the popup — fixed at 668px — can never cross the breakpoint, so it is provably unaffected by anything under `@max-xl:`. Reach for `isSidePanel()` only for genuine surface differences (the pop-out button, `PickingColorPopup`), never for width.
-
-Below the breakpoint the left rail becomes a top bar. The mechanism is flex ordering, not a second component tree: children carry `@max-xl:order-1..6` — logo, palette select, action buttons, format toggle, recents, footer — and wrap naturally into two rows. The dividers are `@max-xl:hidden` because they are horizontal rules. If you add something to the rail, give it an `order` or it lands at the front.
-
-Palette selection swaps control entirely: [components/PaletteLinks.tsx](components/PaletteLinks.tsx) renders **both** the vertical rail and a `<select>`, and the container query shows exactly one (`@max-xl:hidden` / `hidden @max-xl:block`). Rendering both beats measuring width in JS, which would need a `ResizeObserver`. The select is the only place `Palette.FAVOURITES` appears in a list — a complete dropdown would otherwise show a stale label whenever Favourites is active, while the rail deliberately omits it in favour of the heart button.
-
-Two sizes are load-bearing and worth leaving alone. The wordmark in [components/Logo.tsx](components/Logo.tsx) is `@max-xl:hidden` because it is the widest item in the bar; dropping to the icon is what keeps row one on a single line at a 320px panel. The select carries `@max-xl:min-w-28` alongside `@max-xl:flex-1` for a subtler reason: `flex-1` sets `flex-basis: 0`, and a wrapping flex container packs lines using the basis clamped by `min-width`. Without that minimum the select contributes 0 to line-breaking and every item collapses onto one row before growing.
-
-The palette grids **do** reflow — tiles carry `@max-xl:min-w-0 @max-xl:flex-1`, which overrides their hardcoded widths (`w-[37.6px]` in Tailwind, `w-[36.2px]` in Radix) because `flex-basis` beats `width` for flex items. At a 320px panel Tailwind's 11 shades land at roughly 25px each. The shade label is `opacity-0` until hover, so it costs nothing at that size.
-
 ### The copy flow (spans all four entrypoints)
 
 Clicking any swatch runs the handler built by [hooks/useColorTileHandler.ts](hooks/useColorTileHandler.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`, that last step **only in the popup**. The background listener forwards the message to the active tab of the current window, which calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx) — a fresh `createRoot` mounted into a bare `<div>` on the host page that self-removes after 4s. That toast is styled with inline styles only, because it renders on arbitrary sites where the extension's Tailwind is not loaded; keep it that way.

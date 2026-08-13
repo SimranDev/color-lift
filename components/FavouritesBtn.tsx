@@ -11,7 +11,7 @@ const FavouritesBtn = ({ isDragging }: FavouritesBtnProps) => {
   return (
     <div
       id="dropzone"
-      className={`grid h-12 w-12 cursor-pointer place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 hover:from-lime-900 @max-xl:h-9 @max-xl:w-9 ${activePalette === Palette.FAVOURITES ? 'border-2 border-lime-600' : ''}`}
+      className={`grid h-12 w-12 cursor-pointer place-items-center rounded-[4px] bg-gradient-to-tr from-slate-900 to-slate-600 hover:from-lime-900 ${activePalette === Palette.FAVOURITES ? 'border-2 border-lime-600' : ''}`}
       onDragOver={(e) => e.preventDefault()} // Allow dropping
       onDrop={async (e) => {
         e.preventDefault();
@@ -33,7 +33,7 @@ const FavouritesBtn = ({ isDragging }: FavouritesBtnProps) => {
         await setActivePalette(Palette.FAVOURITES);
       }}
     >
-      <img src={favouriteSrc} alt="Color Picker" className={`h-8 @max-xl:h-6 ${isDragging ? 'animate-bounce' : ''}`} />
+      <img src={favouriteSrc} alt="Color Picker" className={`h-8 ${isDragging ? 'animate-bounce' : ''}`} />
     </div>
   );
 };

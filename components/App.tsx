@@ -32,24 +32,21 @@ function App() {
       {pickingColor && !inSidePanel ? (
         <PickingColorPopup />
       ) : (
-        <div className={`shell @container ${inSidePanel ? 'shell--panel' : 'shell--popup'}`}>
-          {/* Below 36rem the left rail becomes a top bar: the children reorder and
-              the `w-full` ones force the wrap, so it lands as three rows. The popup
-              is a fixed 668px, so it never crosses the breakpoint. */}
-          <div className="flex w-32 shrink-0 flex-col gap-2 border-r border-neutral-800 bg-gradient-to-r from-slate-800 to-stone-950 pt-1 @max-xl:w-full @max-xl:flex-row @max-xl:flex-wrap @max-xl:items-center @max-xl:gap-x-2 @max-xl:gap-y-2 @max-xl:border-r-0 @max-xl:border-b @max-xl:bg-gradient-to-b @max-xl:px-2 @max-xl:pb-2">
+        <div className={`shell ${inSidePanel ? 'shell--panel' : 'shell--popup'}`}>
+          <div className="flex w-32 shrink-0 flex-col gap-2 border-r border-neutral-800 bg-gradient-to-r from-slate-800 to-stone-950 pt-1">
             <Logo />
             <FormatToggle />
-            <Divider className="@max-xl:hidden" />
+            <Divider />
             <PaletteLinks />
 
-            <div className="mt-auto flex justify-between px-[10px] pb-1 @max-xl:order-3 @max-xl:mt-0 @max-xl:gap-2 @max-xl:px-0 @max-xl:pb-0">
+            <div className="mt-auto flex justify-between px-[10px] pb-1">
               <EyeDropper setPickingColor={setPickingColor} />
               <FavouritesBtn isDragging={isDragging} />
             </div>
 
-            <Divider className="@max-xl:hidden" />
+            <Divider />
             <Recent />
-            <Divider className="@max-xl:hidden" />
+            <Divider />
             <Footer />
           </div>
 

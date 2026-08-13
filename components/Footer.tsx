@@ -29,7 +29,7 @@ const Footer = ({}: FooterProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 @max-xl:order-6 @max-xl:ml-auto @max-xl:px-0 @max-xl:py-0">
+    <div className="flex items-center gap-2 px-3 py-2">
       <img
         src={GitHubLogo}
         className="h-[21px] cursor-pointer"

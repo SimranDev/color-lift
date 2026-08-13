@@ -16,7 +16,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
       className={`grid gap-[1px] p-1 ${useIsLoadedState() ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
     >
       {colors.map(({ swatches, name }) => (
-        <div key={name} className="flex cursor-default gap-[5px] @max-xl:gap-[2px]">
+        <div key={name} className="flex cursor-default gap-[5px]">
           <span className="text-zinc-200" style={{ fontSize: 11, width: 38, lineHeight: 0.2, margin: 'auto 0' }}>
             {name}
           </span>
@@ -24,7 +24,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
           {swatches.map(({ shade, hex, rgb }) => (
             <div
               key={shade}
-              className="group h-[18.2px] w-[36.2px] text-center transition-transform hover:scale-150 @max-xl:min-w-0 @max-xl:flex-1"
+              className="group h-[18.2px] w-[36.2px] text-center transition-transform hover:scale-150"
               style={{ backgroundColor: hex }}
               onClick={createTileHandler({ hex, rgb })}
             >
