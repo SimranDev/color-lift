@@ -20,7 +20,7 @@ const NordPalette = ({ setIsDragging }: NordPaletteProps) => {
               key={shade}
               className="group grid h-9 w-20 place-items-center text-center transition-transform select-none hover:scale-125"
               style={{ backgroundColor: hex }}
-              onClick={createTileHandler({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb })}
             >
               <div
                 className="h-full w-full pt-[11px] text-center text-[9px] opacity-0 group-hover:opacity-100"
@@ -32,7 +32,7 @@ const NordPalette = ({ setIsDragging }: NordPaletteProps) => {
                     return;
                   }
                   setIsDragging(true);
-                  e.dataTransfer.setData('text/plain', activeFormat === 'hex' ? hex : rgb);
+                  e.dataTransfer.setData('text/plain', formatColor({ hex, rgb }, activeFormat));
                 }}
                 onDragEnd={() => setIsDragging(false)}
               >

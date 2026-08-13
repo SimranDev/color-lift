@@ -24,7 +24,7 @@ const TailwindPalette = ({ setIsDragging }: TailwindPaletteProps) => {
               key={shade}
               className="group h-5 w-[37.6px] text-center transition-transform hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={createTileHandler({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb })}
             >
               <div
                 className={`h-full w-full pt-[3px] text-center text-[9px] opacity-0 group-hover:opacity-100 ${Number(shade) < 600 ? 'text-black' : 'text-zinc-200'}`}
@@ -35,7 +35,7 @@ const TailwindPalette = ({ setIsDragging }: TailwindPaletteProps) => {
                     return;
                   }
                   setIsDragging(true);
-                  e.dataTransfer.setData('text/plain', activeFormat === 'hex' ? hex : rgb);
+                  e.dataTransfer.setData('text/plain', formatColor({ hex, rgb }, activeFormat));
                 }}
                 onDragEnd={() => setIsDragging(false)}
               >

@@ -1,7 +1,9 @@
 import useStore from '@/hooks/useStore';
+import { useColorTileHandler } from '@/hooks/useColorTileHandler';
 
 const Recent = () => {
-  const { recent, setRecent } = useStore();
+  const { recent } = useStore();
+  const createTileHandler = useColorTileHandler();
 
   return (
     <div className="grid gap-1 px-2 pb-1">
@@ -12,11 +14,7 @@ const Recent = () => {
             key={hex}
             style={{ backgroundColor: hex }}
             className="group h-4 w-[33px] cursor-pointer pt-[3px] text-center text-[6px] uppercase transition-transform hover:scale-150"
-            onClick={async () => {
-              await setRecent({ hex, rgb });
-              window.close();
-              browser.runtime.sendMessage({ color: hex });
-            }}
+            onClick={createTileHandler({ hex, rgb })}
           >
             <span className="opacity-0 group-hover:opacity-100" style={{ color: getContrastColor(hex) }}>
               {hex}

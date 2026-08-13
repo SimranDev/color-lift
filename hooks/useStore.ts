@@ -1,12 +1,13 @@
 import { setRecent, setActiveFormat, setActivePalette, store, setFavourites, type StoredState } from '@/store';
 import { useEffect, useState } from 'react';
 import { Palette } from '@/types/enums';
+import type { ColorFormat } from '@/types/common';
 
 type Store = {
   recent: { hex: string; rgb: string }[];
   setRecent: (recent: { hex: string; rgb: string }) => Promise<void>;
-  activeFormat: 'hex' | 'rgb';
-  setActiveFormat: (format: 'hex' | 'rgb') => Promise<void>;
+  activeFormat: ColorFormat;
+  setActiveFormat: (format: ColorFormat) => Promise<void>;
   activePalette: Palette;
   setActivePalette: (palette: Palette) => Promise<void>;
   favourites: { hex: string; rgb: string }[];
@@ -50,7 +51,7 @@ function useStore(): Store {
     await setRecent(updatedRecent.slice(0, 6));
   };
 
-  const updateActiveFormat = async (format: 'hex' | 'rgb') => {
+  const updateActiveFormat = async (format: ColorFormat) => {
     setActiveFormatState(format);
     await setActiveFormat(format);
   };

@@ -4,5 +4,6 @@ export enum Palette {
   RADIX_DARK = 'radix-dark',
   RADIX_LIGHT = 'radix-light',
   NORD = 'nord',
+  MATCH = 'match',
   FAVOURITES = 'favourites',
 }

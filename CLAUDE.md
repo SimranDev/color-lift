@@ -29,32 +29,53 @@ If types/auto-imports look wrong after adding a file under `components/`, `hooks
 | `utils/seed/tailwind`    | `TAILWIND`    | [components/palettes/TailwindColors.tsx](components/palettes/TailwindColors.tsx)   |
 | `utils/seed/material`    | `MATERIAL`    | [components/palettes/MaterialPalette.tsx](components/palettes/MaterialPalette.tsx) |
 | `utils/seed/nord`        | `NORD`        | [components/palettes/NordPalette.tsx](components/palettes/NordPalette.tsx)         |
-| `utils/seed/radix-dark`  | `RADIX_DARK`  | [entrypoints/popup/App.tsx](entrypoints/popup/App.tsx)                             |
-| `utils/seed/radix-light` | `RADIX_LIGHT` | [entrypoints/popup/App.tsx](entrypoints/popup/App.tsx)                             |
+| `utils/seed/radix-dark`  | `RADIX_DARK`  | [components/App.tsx](components/App.tsx)                                           |
+| `utils/seed/radix-light` | `RADIX_LIGHT` | [components/App.tsx](components/App.tsx)                                           |
 
 Every swatch carries `hex` **and** `rgb` as pre-computed strings — the UI never converts between them at render time, it just picks the field matching `activeFormat`. The two must stay in sync by hand; `rgb` is formatted `rgb(r, g, b)` with spaces after the commas, which is what `rgbToHex`'s digit-matching and the Favourites drop handler expect.
+
+The third format, `oklch`, is **derived at render time** from `hex` by `hexToOklch` — deliberately not a stored field. A hand-synced third string across 1184 swatches is a maintenance trap, and the conversion is cheap. Note this means an `oklch()` string round-tripped from a Tailwind v4 hex differs from Tailwind's published value by ~0.1% lightness, because the hex is itself a rounded sRGB fallback of an oklch-authored original. That drift is far below a just-noticeable difference; don't "fix" it by hardcoding values.
 
 Both identifiers are load-bearing as React keys: `shade` must be unique within its group, and `name` must be unique within its file. Material previously shipped `Amber` twice (with `Deep Orange` missing entirely), so it's worth re-checking uniqueness after editing seed data.
 
 ## Architecture
 
-WXT 0.21 (`wxt.config.ts`, Vite 8 / Rolldown) + React 19 + Tailwind v4 + TypeScript 7, MV3. Three entrypoints under [entrypoints/](entrypoints/):
+WXT 0.21 (`wxt.config.ts`, Vite 8 / Rolldown) + React 19 + Tailwind v4 + TypeScript 7, MV3. Four entrypoints under [entrypoints/](entrypoints/):
 
-- **`popup/`** — the whole UI. Fixed 668×600 (`.popup` in [entrypoints/popup/style.css](entrypoints/popup/style.css)).
+- **`popup/`** — mounts the shared UI at a fixed 668×600 (`.shell--popup` in [assets/app.css](assets/app.css)).
+- **`sidepanel/`** — mounts the same [components/App.tsx](components/App.tsx) at whatever width the user has dragged the panel to (`.shell--panel`). WXT emits this as `side_panel` on Chromium and `sidebar_action` on Firefox, and auto-adds the `sidePanel` permission — neither is declared in `wxt.config.ts`.
 - **`background.ts`** — a message relay, nothing else.
 - **`toast.content/`** — content script on `*://*/*` that renders the "Copied to clipboard!" toast.
 
-### The copy flow (spans all three entrypoints)
+### The copy flow (spans all four entrypoints)
 
-Clicking any swatch runs the handler built by [hooks/useColorTileHandler.ts](hooks/useColorTileHandler.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`. The background listener forwards the message to the active tab of the current window, which calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx) — a fresh `createRoot` mounted into a bare `<div>` on the host page that self-removes after 4s. That toast is styled with inline styles only, because it renders on arbitrary sites where the extension's Tailwind is not loaded; keep it that way.
+Clicking any swatch runs the handler built by [hooks/useColorTileHandler.ts](hooks/useColorTileHandler.ts): write to `recent` → `navigator.clipboard.writeText` → `browser.runtime.sendMessage({ color })` → `window.close()`, that last step **only in the popup**. The background listener forwards the message to the active tab of the current window, which calls `showToast` from [components/CustomToast.tsx](components/CustomToast.tsx) — a fresh `createRoot` mounted into a bare `<div>` on the host page that self-removes after 4s. That toast is styled with inline styles only, because it renders on arbitrary sites where the extension's Tailwind is not loaded; keep it that way.
 
 Nothing renders if the active tab is a `chrome://` page, the Web Store, or anywhere else the content script cannot run. The clipboard write still succeeds — only the confirmation is missing.
 
 `host_permissions` for `https://*/*` and `http://*/*` exist solely so `browser.tabs.sendMessage` can reach those content scripts.
 
+The popup reaches the panel through the pop-out button in [components/Footer.tsx](components/Footer.tsx). `sidePanel.open()` must run inside the click's user gesture, so the window id is fetched on mount rather than awaited in the handler, and the call is deliberately not awaited — opening the panel takes focus off the popup, which closes it, leaving the promise unsettled. Firefox has no `sidePanel` API, so the same button feature-detects `sidebarAction` first.
+
+The two surfaces have opposite lifecycles, and `isSidePanel()` in [utils/surface.ts](utils/surface.ts) is what separates them — it sniffs `location.pathname` for `sidepanel`, because WXT emits the entrypoint as `sidepanel.html` at the bundle root. That beats threading a React context through every component that copies a colour. Every copy path goes through `useColorTileHandler`, so the close-vs-stay-open decision lives in exactly one place; **don't reintroduce a bare `window.close()`** in a component. `Recent`, `FavouritesPalette` and `EyeDropper` each used to hand-roll their own copy and are now callers of that hook.
+
+A declared content script only reaches pages that load _after_ it is registered, so every tab already open at install or update time would otherwise have no listener — the first copy silently shows no toast until that tab happens to reload. The `onInstalled` handler in [entrypoints/background.ts](entrypoints/background.ts) closes that gap by injecting into existing `http(s)` tabs via `browser.scripting.executeScript`; that is the only reason the `scripting` permission is in `wxt.config.ts`. It derives the file list from `browser.runtime.getManifest().content_scripts` and prefixes each path with `/`, because WXT types `executeScript`'s `files` as `ScriptPublicPath` — the generated union in `.wxt/types/paths.d.ts`, whose members are rooted while the manifest's are relative. A tab that loads mid-injection would end up with two listeners, so `toast.content/index.ts` guards on a `window.__colorLiftToastReady` flag.
+
+### Eye dropper
+
+[components/EyeDropper.tsx](components/EyeDropper.tsx) uses `window.EyeDropper`, which is **Chromium-only** — Firefox has no implementation and [no committed plan](https://github.com/mozilla/standards-positions/issues/557) for one. The component feature-detects once at module scope and renders a disabled tile with an explanatory `title` on Firefox, rather than attaching a handler that fails after the click.
+
+This is a decision, not an oversight: the screenshot-and-canvas workaround (`tabs.captureVisibleTab` + an overlay content script) can only sample the active tab's viewport, never the other applications this extension exists to pick colours from, and `getDisplayMedia` costs a screen-share prompt on every pick. Neither was judged worth it for the Firefox install base. Don't add a fallback without revisiting that trade.
+
+The tile stays rendered rather than hidden because it shares a `justify-between` row with `FavouritesBtn` in [components/App.tsx](components/App.tsx); removing it would slide the heart button to the left edge.
+
+`PickingColorPopup` — the shrunken "PICK A COLOUR" hint — renders **only in the popup**, where the window would otherwise cover the page being picked from. The side panel is docked out of the way already, so it keeps showing the palette while the picker is open.
+
 ### State
 
 One WXT storage item, `local:color-store`, defined in [store/index.ts](store/index.ts) — `recent` (capped at 6), `favourites`, `activeFormat`, `activePalette`. The setters there are whole-object read-modify-write, so concurrent writes to different fields can clobber each other.
+
+`activeFormat` is the `ColorFormat` union in [types/common.ts](types/common.ts) (`hex | rgb | oklch`), and the popup and side panel share one storage item — so changing the format or palette in one surface immediately updates the other through `store.watch`.
 
 `storage.defineItem`'s `fallback` only covers a **missing item, not missing keys**. An install predating a field reads that field back as `undefined`, so `useStore` defaults every field as it hydrates. Don't assume a field is populated just because the type says so.
 
@@ -77,6 +98,8 @@ WXT auto-imports everything from `components/`, `hooks/`, and `utils/` (default 
 Each palette is its own component under [components/palettes/](components/palettes/) with hardcoded tile sizes, because the color sets have different shape (Nord has few wide swatches; Tailwind/Material are dense grids). `RadixPalette` is the only generic one — it takes `colors: Color[]` and serves both Radix Dark and Radix Light. `App.tsx` switches on `activePalette` with a chain of `&&` conditionals.
 
 Adding a palette means touching four places: the `Palette` enum in [types/enums.ts](types/enums.ts), `paletteOptions` in [utils/options.ts](utils/options.ts) (this drives the sidebar links), a component, and the conditional chain in `App.tsx`.
+
+`Palette.MATCH` rides that same mechanism without being a palette: [components/palettes/MatchPalette.tsx](components/palettes/MatchPalette.tsx) takes a pasted or eyedropped colour and ranks every seed swatch by perceptual distance. The index in [utils/match.ts](utils/match.ts) precomputes OKLab coordinates for all 1184 swatches once at module load, because the view re-searches on every keystroke. Distance is `deltaEOk` — plain Euclidean distance in OKLab, which is only meaningful because OKLab is perceptually uniform; **don't** substitute RGB distance.
 
 Tile click handlers come from `useColorTileHandler()`, which each palette calls **once** and then reuses: `const createTileHandler = useColorTileHandler();` at the top, `onClick={createTileHandler(swatch)}` inside the map. `createTileHandler` is a plain function, not a hook — do not inline the hook into the map. Doing so mounts one `useStore` per swatch (336 on Radix), which is both a Rules-of-Hooks violation and the performance bug described above.
 

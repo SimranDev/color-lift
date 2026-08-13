@@ -30,8 +30,20 @@ kbd {
   font-weight: 600;
 }
 
-.popup {
+.shell {
   display: flex;
+}
+
+/* The popup is a fixed pane — the browser sizes the window to fit it. */
+.shell--popup {
   width: 668px;
   height: 600px;
+}
+
+/* The side panel is whatever width the user has dragged it to, so it fills the
+   viewport and lets the palette region scroll. The palettes hardcode their tile
+   sizes (see components/palettes/), so reflowing them is not an option. */
+.shell--panel {
+  width: 100%;
+  height: 100vh;
 }

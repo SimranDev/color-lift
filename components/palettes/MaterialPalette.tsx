@@ -23,7 +23,7 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
               key={shade}
               className="group grid h-6 w-7 place-items-center text-center transition-transform select-none hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={createTileHandler({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb })}
             >
               <div
                 className="h-full w-full pt-[5px] text-[9px] opacity-0 group-hover:opacity-100"
@@ -35,7 +35,7 @@ const MaterialPalette = ({ setIsDragging }: MaterialPaletteProps) => {
                     return;
                   }
                   setIsDragging(true);
-                  e.dataTransfer.setData('text/plain', activeFormat === 'hex' ? hex : rgb);
+                  e.dataTransfer.setData('text/plain', formatColor({ hex, rgb }, activeFormat));
                 }}
                 onDragEnd={() => setIsDragging(false)}
               >

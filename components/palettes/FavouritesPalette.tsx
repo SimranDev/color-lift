@@ -1,7 +1,8 @@
 import howToVid from '@/assets/howto-vid.mp4';
 
 const FavouritesPalette = () => {
-  const { favourites, setRecent, activeFormat, removeFavourite } = useStore();
+  const { favourites, removeFavourite } = useStore();
+  const createTileHandler = useColorTileHandler();
   const [showGif, setShowGif] = useState(false);
 
   return (
@@ -10,18 +11,12 @@ const FavouritesPalette = () => {
       <div className="flex h-fit flex-wrap gap-2 p-2">
         {favourites && favourites.length
           ? favourites.map(({ hex, rgb }) => {
-              const color = activeFormat === 'hex' ? hex : rgb;
               return (
                 <div
                   key={hex}
                   className="group flex h-6 w-17 p-[1px] text-center transition-transform select-none hover:scale-150"
                   style={{ backgroundColor: hex, color: getContrastColor(hex) }}
-                  onClick={async () => {
-                    await setRecent({ hex: hex, rgb: rgb });
-                    await navigator.clipboard.writeText(color);
-                    await browser.runtime.sendMessage({ color });
-                    window.close();
-                  }}
+                  onClick={createTileHandler({ hex, rgb })}
                 >
                   <div className={`h-full w-full pt-[5px] text-[8px] opacity-0 group-hover:opacity-100`}>
                     {hex.toUpperCase()}

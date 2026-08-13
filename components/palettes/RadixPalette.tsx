@@ -26,7 +26,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
               key={shade}
               className="group h-[18.2px] w-[36.2px] text-center transition-transform hover:scale-150"
               style={{ backgroundColor: hex }}
-              onClick={createTileHandler({ hex, rgb, shade })}
+              onClick={createTileHandler({ hex, rgb })}
             >
               <div
                 className="h-full w-full pt-[3px] text-center text-[9px] opacity-0 group-hover:opacity-100"
@@ -38,7 +38,7 @@ const RadixPalette = ({ colors, setIsDragging }: RadixPaletteProps) => {
                     return;
                   }
                   setIsDragging(true);
-                  e.dataTransfer.setData('text/plain', activeFormat === 'hex' ? hex : rgb);
+                  e.dataTransfer.setData('text/plain', formatColor({ hex, rgb }, activeFormat));
                 }}
                 onDragEnd={() => setIsDragging(false)}
               >

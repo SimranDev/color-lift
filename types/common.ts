@@ -3,6 +3,8 @@ export type Option<T> = {
   value: T;
 };
 
+export type ColorFormat = 'hex' | 'rgb' | 'oklch';
+
 export type Swatch = {
   shade: string;
   hex: string;
